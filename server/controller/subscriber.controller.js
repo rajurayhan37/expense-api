@@ -9,55 +9,64 @@ const {
   } = require('../services/subscriber.service');
   const bcrypt = require('bcrypt')
   const { hashSync, genSaltSync } = require("bcrypt");
-  const { sign } = require("jsonwebtoken");
+  const jwt = require("jsonwebtoken");
   const remove = require('../helper/unlinker')
   
 
   module.exports = {
     createUser: (req, res) => {
-      const body = req.body;
-      getUserByUserEmail(body.email, (err, results) => {
-        if(err){
-          return res.json({
-            success: 0,
-            data: 'Internal server error!'
-          })
-        }
-        if(results){
-          return res.json({
-            success: 0,
-            data: 'Email already used!'
-          })
-        }else{
-          
-          const salt = genSaltSync(10);
-          body.password = hashSync(body.password, salt);
-          create(body, (err, results) => {
-            if (err) {
-              console.log(err);
-              return res.status(500).json({
-                success: 0,
-                message: "Database connection errror"
+      const body = req.body.body;
+      console.log(req.data.code , body.verificationCode)
+      if(req.data.code == body.verificationCode){
+        getUserByUserEmail(body.email, (err, results) => {
+          if(err){
+            return res.json({
+              success: 0,
+              data: 'Internal server error!'
+            })
+          }
+          if(results){
+            return res.json({
+              success: 0,
+              data: 'Email already used!'
+            })
+          }else{
+            
+            const salt = genSaltSync(10);
+            body.password = hashSync(body.password, salt);
+            create(body, (err, results) => {
+              if (err) {
+                console.log(err);
+                return res.status(500).json({
+                  success: 0,
+                  message: "Database connection errror"
+                });
+              }
+              const info = {
+                firstName: body.firstName,
+                lastName: body.lastName,
+                email: body.email,
+                phone: body.phone
+              }
+              const jsontoken = jwt.sign({ info}, process.env.JWT_KEY, {
+                expiresIn: "1h"
               });
-            }
-            const info = {
-              firstName: body.firstName,
-              lastName: body.lastName,
-              email: body.email,
-              phone: body.phone
-            }
-            const jsontoken = sign({ info}, process.env.JWT_KEY, {
-              expiresIn: "1h"
+              return res.status(200).json({
+                success: 1,
+                message: 'Register Successfull',
+                data: results,
+                token: jsontoken
+              });
             });
-            return res.status(200).json({
-              success: 1,
-              message: 'Register Successfull',
-              data: results,
-              token: jsontoken
-            });
-          });
-        }
-      })
+          }
+        })
+      }else{
+        return res.json({
+          success: 0,
+          message: 'Invalid confirmation code please check your email!'
+        })
+      }
+      
     },
 
     login: (req, res) => {
@@ -80,7 +89,7 @@ const {
         const result = bcrypt.compare(body.password, results.password);
         if (result) {
           results.password = undefined;
-          const jsontoken = sign({ result: results }, process.env.JWT_KEY, {
+          const jsontoken = jwt.sign({ result: results }, process.env.JWT_KEY, {
             expiresIn: "1h"
           });
           return res.json({

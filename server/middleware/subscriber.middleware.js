@@ -20,10 +20,10 @@ module.exports = {
                   data: 'Email already used!'
                 })
               }else{
-
+                //generate random 6 digit verification code
                 const verificationCode = (Math.floor(100000 + Math.random() * 900000)).toString()
-                console.log(typeof(verificationCode), verificationCode)
-                const jsontoken = sign({ verificationCode }, process.env.JWT_KEY, {
+                body.verificationCode = verificationCode
+                const jsontoken = sign({ body }, process.env.JWT_KEY, {
                   expiresIn: '10m'
                 });
 
@@ -208,14 +208,14 @@ module.exports = {
                         console.log('Error Occurs', err);
                         return res.json({
                             success: 0,
-                            message: 'Registration failed!'
+                            message: 'Registration failed!',
+                            token: jsontoken
                         })
                     } else {
                         return res.json({
                             success: 1,
                             message: 'Verification code sent to your email.',
-                            token: jsontoken,
-                            data: body
+                            token: jsontoken
                         })
                     }
                 });

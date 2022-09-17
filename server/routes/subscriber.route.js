@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router();
-const { checkToken } = require("../auth/validation");
+const { checkToken, checkActivationToken } = require("../auth/validation");
 const {
   createUser,
   login,
@@ -17,7 +17,7 @@ const {emailVerificationSend} = require('../middleware/subscriber.middleware')
 
 router.get("/", checkToken, getUsers);
 router.post("/signup", emailVerificationSend)
-router.post("/create", checkToken, createUser);
+router.post("/create", checkActivationToken, createUser);
 router.get("/:id", checkToken, getUserByUserId);
 router.post("/login", login);
 router.patch("/update/", checkToken, updateUsers);
