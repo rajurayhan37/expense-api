@@ -6,7 +6,7 @@ const {
     updateUser,
     deleteUser,
     uploadAvatar
-  } = require('../services/subscriber.service');
+  } = require('../services/user.service');
   const bcrypt = require('bcrypt')
   const { hashSync, genSaltSync } = require("bcrypt");
   const jwt = require("jsonwebtoken");
@@ -15,54 +15,36 @@ const {
 
   module.exports = {
     createUser: (req, res) => {
-      const body = req.body.body;
-      console.log(req.data.code , body.verificationCode)
-      if(req.data.code == body.verificationCode){
-        getUserByUserEmail(body.email, (err, results) => {
-          if(err){
-            return res.json({
-              success: 0,
-              data: 'Internal server error!'
-            })
-          }
-          if(results){
-            return res.json({
-              success: 0,
-              data: 'Email already used!'
-            })
-          }else{
-            
-            const salt = genSaltSync(10);
-            body.password = hashSync(body.password, salt);
-            create(body, (err, results) => {
-              if (err) {
-                console.log(err);
-                return res.status(500).json({
-                  success: 0,
-                  message: "Database connection errror"
-                });
-              }
-              const info = {
-                firstName: body.firstName,
-                lastName: body.lastName,
-                email: body.email,
-                phone: body.phone
-              }
-              const jsontoken = jwt.sign({ info}, process.env.JWT_KEY, {
-                expiresIn: "1h"
-              });
-              return res.status(200).json({
-                success: 1,
-                message: 'Register Successfull',
-                data: results,
-                token: jsontoken
-              });
+      const body = req.data.body;
+      if(req.body.code == body.verificationCode){
+        create(body, (err, results) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).json({
+              success: false,
+              message: "Database connection errror"
             });
           }
+
+          const info = {
+            name: body.name,
+            email: body.email,
+          }
+
+          const jsontoken = jwt.sign({ info}, process.env.JWT_KEY, {
+            expiresIn: "1h"
+          });
+
+          return res.status(200).json({
+            success: true,
+            message: 'Register Successfull',
+            data: results,
+            token: jsontoken
+          });
         })
       }else{
         return res.json({
-          success: 0,
+          success: false,
           message: 'Invalid confirmation code please check your email!'
         })
       }
@@ -75,14 +57,14 @@ const {
         if (err) {
           console.log(err);
           return res.json({
-            success: 0,
+            success: false,
             data: 'Internal server error!'
           })
         }
 
         if (!results) {
           return res.json({
-            success: 0,
+            success: false,
             data: "Invalid email or password",
           });
         }
@@ -93,13 +75,13 @@ const {
             expiresIn: "1h"
           });
           return res.json({
-            success: 1,
+            success: true,
             message: "login successfully",
             token: jsontoken
           });
         } else {
           return res.json({
-            success: 0,
+            success: false,
             data: "Invalid email or password",
             email: body.email,
             pass: body.password
@@ -116,13 +98,13 @@ const {
         }
         if (!results) {
           return res.json({
-            success: 0,
+            success: false,
             message: "Record not Found"
           });
         }
         results.password = undefined;
         return res.json({
-          success: 1,
+          success: true,
           data: results
         });
       });
@@ -134,7 +116,7 @@ const {
           return;
         }
         return res.json({
-          success: 1,
+          success: true,
           data: results
         });
       });
@@ -149,7 +131,7 @@ const {
           return;
         }
         return res.json({
-          success: 1,
+          success: true,
           message: "Updated successfully"
         });
       });
@@ -160,18 +142,18 @@ const {
         if (err) {
           console.log(err);
           return res.json({
-            success: 0,
+            success: false,
             message: 'Internal server error!'
           });
         }
         if (!results) {
           return res.json({
-            success: 0,
+            success: false,
             message: "User not found!",
           });
         }
         return res.json({
-          success: 1,
+          success: true,
           message: "User deleted successfully"
         });
       });
@@ -186,20 +168,20 @@ const {
         if (err) {
           console.log(err);
           return res.json({
-            success: 0,
+            success: false,
             message: 'Internal server error!'
           })
         }
 
-        if(results.affectedRows == 0){
+        if(results.affectedRows == false){
           return res.json({
-            success: 0,
+            success: false,
             message: 'Internal server error!'
           })
         }
 
         return res.json({
-          success: 1,
+          success: true,
           message: "Avatar successfully updated"
         });
       });
@@ -214,7 +196,7 @@ const {
         }
         if (!results) {
           return res.json({
-            success: 0,
+            success: false,
             message: "Invalid credintial!"
           });
         }

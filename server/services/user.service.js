@@ -3,14 +3,12 @@ const pool = require('../config/db.config');
 module.exports = {
   create: (data, callBack) => {
     pool.query(
-      `INSERT INTO subscriber(firstName, lastName, email, password, phone) 
-                values(?,?,?,?,?)`,
+      `INSERT INTO users(name, email, password) 
+                values(?,?,?)`,
       [
-        data.firstName,
-        data.lastName,
+        data.name,
         data.email,
         data.password,
-        data.phone
       ],
       (error, results, fields) => {
         if (error) {
@@ -22,7 +20,7 @@ module.exports = {
   },
   getUserByUserEmail: (email, callBack) => {
     pool.query(
-      `SELECT * FROM subscriber WHERE email = ?`,
+      `SELECT * FROM users WHERE email = ?`,
       [email],
       (error, results, fields) => {
         if (error) {
@@ -34,7 +32,7 @@ module.exports = {
   },
   getUserByUserId: (id, callBack) => {
     pool.query(
-      `SELECT * FROM subscriber where id = ?`,
+      `SELECT * FROM users where id = ?`,
       [id],
       (error, results, fields) => {
         if (error) {
@@ -46,7 +44,7 @@ module.exports = {
   },
   getUsers: callBack => {
     pool.query(
-      `SELECT * FROM subscriber`,
+      `SELECT * FROM users`,
       [],
       (error, results, fields) => {
         if (error) {

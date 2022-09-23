@@ -1,12 +1,14 @@
 require('dotenv').config()
 const express = require('express') 
-const subscriberRouter = require('./routes/subscriber.route')
+const userRouter = require('./routes/user.route')
+const walletRouter = require('./routes/wallet.route')
 
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.use('/api/subscriber/', subscriberRouter)
+app.use('/api/user/', userRouter)
+app.use('/api/wallet/', walletRouter)
 
 //server
 const PORT = process.env.PORT || 3000

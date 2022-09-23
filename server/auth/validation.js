@@ -10,8 +10,8 @@ module.exports = {
       jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
         if (err) {
           return res.json({
-            success: 0,
-            message: "Token is expired!"
+            success: false,
+            message: "Invalid token!"
           });
         } else {
           req.body = decoded;
@@ -20,32 +20,30 @@ module.exports = {
       });
     } else {
       return res.json({
-        success: 0,
+        success: false,
         message: "Access Denied! Unauthorized User"
       });
     }
   },
+
   checkActivationToken: (req, res, next) => {
     let token = req.body.token;
     if (token) {
-      // Remove Bearer from string
-      token = token.slice(process.env.JWT_KEY.length);
       jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
         if (err) {
           return res.json({
-            success: 0,
-            message: "Expire your confirmation code!"
+            success: false,
+            message: "Invalid token!"
           });
         } else {
-          req.decoded = decoded;
-          console.log(jwt.decode(token))
+          req.data = decoded;
           next();
         }
       });
     } else {
       return res.json({
-        success: 0,
-        message: "Invalid your confirmation code!"
+        success: false,
+        message: "Access Denied! Unauthorized User"
       });
     }
   },
