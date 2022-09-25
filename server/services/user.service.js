@@ -30,6 +30,26 @@ module.exports = {
       }
     );
   },
+  updatePassword: (data, callBack) => {
+    try{
+      pool.query(
+        `UPDATE users SET password=? where email = ?`,
+        [
+          data.password,
+          data.email
+        ],
+        (error, results, fields) => {
+          if (error) {
+            callBack(error);
+          }
+          return callBack(null, results);
+        }
+      );
+    }catch(err){
+
+    }
+  },
+
   getUserByUserId: (id, callBack) => {
     pool.query(
       `SELECT * FROM users where id = ?`,
@@ -60,7 +80,7 @@ module.exports = {
   },
   updateUser: (data, callBack) => {
     pool.query(
-      `UPDATE subscriber SET firstName=?, lastName=?, email=?, number=? where id = ?`,
+      `UPDATE users SET firstName=?, lastName=?, email=?, number=? where id = ?`,
       [
         data.first_name,
         data.last_name,
@@ -78,7 +98,7 @@ module.exports = {
   },
   deleteUser: (id, callBack) => {
     pool.query(
-      `DELETE FROM subscriber WHERE id = ?`,
+      `DELETE FROM users WHERE id = ?`,
       [id],
       (error, results, fields) => {
         if (error) {
@@ -90,7 +110,7 @@ module.exports = {
   },
   uploadAvatar: (data, callBack) => {
     pool.query(
-      `UPDATE subscriber SET image = ? WHERE id = ?`,
+      `UPDATE users SET image = ? WHERE id = ?`,
       [
         data.image,
         data.id

@@ -49,7 +49,7 @@ module.exports = {
   },
   updateWallet: (data, callBack) => {
     pool.query(
-      `UPDATE wallets SET resource=?, bank_account=?, initial_balance=?, total_expense=? where id = ?`,
+      `UPDATE wallets SET resource=?, bank_account=?, initial_balance=?, total_expense=?, where id = ?`,
       [
         data.resource,
         data.bankAccount,

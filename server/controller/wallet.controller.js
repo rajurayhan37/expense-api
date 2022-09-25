@@ -12,10 +12,8 @@ const { hashSync, genSaltSync } = require("bcrypt");
     createWallet: (req, res) => {
         const body = req.body;
         const salt = genSaltSync(10);
-        //body.bankAccount = hashSync(body.bankAccount, salt);
         createWallet(body, (err, results) => {
           if (err) {
-            console.log(err);
             return res.status(500).json({
               success: false,
               message: "Database connection failed!. Please try again"
@@ -48,8 +46,8 @@ const { hashSync, genSaltSync } = require("bcrypt");
         });
       });
     },
-    getUsers: (req, res) => {
-      getUsers((err, results) => {
+    getWallet: (req, res) => {
+      getWallets((err, results) => {
         if (err) {
           console.log(err);
           return;

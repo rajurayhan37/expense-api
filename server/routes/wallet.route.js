@@ -1,14 +1,16 @@
 const express = require("express")
 const router = express.Router();
-const { checkToken, checkActivationToken } = require("../auth/validation");
+const { checkToken } = require("../auth/validation");
 const { dataValidate } = require('../middleware/wallet.middleware')
 const {
-  createWallet
+  createWallet,
+  getWallet
   
 } = require("../controller/wallet.controller");
 
 
 router.post("/new", dataValidate, createWallet);
+router.get('/all', getWallet);
 
 
 module.exports = router;

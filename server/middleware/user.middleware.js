@@ -25,28 +25,22 @@ module.exports = {
           success: false,
           message: 'Please provide all information!'
         })
-      }
-      else if(body.name == undefined || body.name == ''){
-        return res.json({
-          success: false,
-          message: 'Please provide your fullname!',
-        })
       }else if(body.email == undefined || body.email == ''){
         return res.json({
           success: false,
-          message: 'Please provide your email!',
+          message: 'Please enter your email!',
         })
       }
       else if(!validateEmail(body.email)){
         res.json({
           success: false,
-          message: 'Invalid email!. Please enter your valid email.'
+          message: 'Invalid email!.Please enter valid email.'
         })
       }
       else if(body.password == undefined || body.password == ''){
         return res.json({
           success: false,
-          message: 'Please provide your password!',
+          message: 'Please enter your password!',
         })
       }else if(!passwordValidation(body.password)){
         return res.json({
@@ -58,7 +52,17 @@ module.exports = {
       }
     },
 
-    emailVerificationSend: (req, res, next) => {
+    checkPasswordStrong: (req, res, next) => {
+      if(passwordValidation(req.body.password)){
+        next()
+      }
+      return res.json({
+        success: false,
+        message: "Password must be minimum 8 including number,upper and lowercase letter!"
+      })
+    },
+
+    emailVerificationSend: (req, res) => {
         const body = req.body
         getUserByUserEmail(body.email, (err, results) => {
             if(err){
@@ -71,16 +75,18 @@ module.exports = {
             if(results){
                 return res.json({
                   success: false,
-                  data: 'This email already used!. Please enter vlaid email.'
+                  data: 'Email is already used!. Please enter vlaid email.'
                 })
               }else{
-                //generate random 6 digit verification code
-                const verificationCode = (Math.floor(100000 + Math.random() * 900000)).toString()
+                //generate random 4 digit verification code
+                const verificationCode = (Math.floor(1000 + Math.random() * 9000)).toString()
                 body.verificationCode = verificationCode
+                //encrypt the password
                 const salt = genSaltSync(10);
                 body.password = hashSync(body.password, salt);
+                //create jwt token with users info
                 const jsontoken = sign({ body }, process.env.JWT_KEY, {
-                  expiresIn: '20m'
+                  expiresIn: '10m'
                 });
 
                 let mailTransporter = nodemailer.createTransport({
@@ -231,8 +237,6 @@ module.exports = {
                                     <a  style=" background-color: #1a82e2; padding: 10px 15px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 20px; color: #ffffff; text-decoration: none; border-radius: 6px;">${verificationCode[1]}</a>
                                     <a  style=" background-color: #1a82e2; padding: 10px 15px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 20px; color: #ffffff; text-decoration: none; border-radius: 6px;">${verificationCode[2]}</a>
                                     <a  style=" background-color: #1a82e2; padding: 10px 15px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 20px; color: #ffffff; text-decoration: none; border-radius: 6px;">${verificationCode[3]}</a>
-                                    <a  style=" background-color: #1a82e2; padding: 10px 15px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 20px; color: #ffffff; text-decoration: none; border-radius: 6px;">${verificationCode[4]}</a>
-                                    <a  style=" background-color: #1a82e2; padding: 10px 15px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 20px; color: #ffffff; text-decoration: none; border-radius: 6px;">${verificationCode[5]}</a>
                                   </div>
                                 </td>
                               </tr>
@@ -285,14 +289,14 @@ module.exports = {
             if(err){
                 res.json({
                     sucsess: false,
-                    message: "Didn't matche with your email!"
+                    message: "Email is not registerd!"
                 })
             }
             
             if(results){
                 
               
-                //generate random 6 digit verification code
+                //generate random 4 digit verification code
                 const verificationCode = (Math.floor(1000 + Math.random() * 9000)).toString()
                 body.verificationCode = verificationCode
                 
@@ -479,7 +483,7 @@ module.exports = {
                         console.log('Error Occurs', err);
                         return res.json({
                             success: false,
-                            message: 'Registration failed!',
+                            message: 'Failed to send verification code!',
                             token: jsontoken
                         })
                     } else {
@@ -493,4 +497,75 @@ module.exports = {
               }
         })
     }
+  ,
+  
+  checkEmailRegister: (req, res, next) => {
+    getUserByUserEmail(req.body.email, (err, results) => {
+      if(err){
+        return res.statusCode(500).json({
+          success: false,
+          message: "Something went wrong!. Please try again",
+        })
+      }
+      if(results){
+        next()
+      }
+      else{
+        return res.json({
+          success: false,
+          message: "Email is not registerd!. Please enter your registerd email"
+        })
+      }
+      
+    })
+  },
+
+  checkVerificationCode: (req, res, next) => {
+    if(req.data.body.verificationCode == req.body.code){
+      const info = {email: req.data.body.email}
+      const jsontoken = sign({info}, process.env.JWT_KEY, {
+        expiresIn: '10m'
+      });
+
+      return res.json({
+        success: true,
+        token: jsontoken
+      })
+    }
+
+    return res.json({
+      success: false,
+      message: "Invalid verification code!."
+    })
+  },
+
+  loginDataValidation: (req, res, next) => {
+    const body = req.body;
+    if(body == undefined){
+      return res.json({
+        success: false,
+        message: 'Please provide email and password!'
+      })
+    }else if(body.email == undefined || body.email == ''){
+      return res.json({
+        success: false,
+        message: 'Please enter your email!',
+      })
+    }
+    else if(!validateEmail(body.email)){
+      res.json({
+        success: false,
+        message: 'Invalid email!.Please enter valid email.'
+      })
+    }
+    else if(body.password == undefined || body.password == ''){
+      return res.json({
+        success: false,
+        message: 'Please enter your password!',
+      })
+    }else{
+      next()
+    }
+  },
 }
+

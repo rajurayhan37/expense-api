@@ -5,7 +5,8 @@ const {
     getUsers,
     updateUser,
     deleteUser,
-    uploadAvatar
+    uploadAvatar,
+    updatePassword
   } = require('../services/user.service');
   const bcrypt = require('bcrypt')
   const { hashSync, genSaltSync } = require("bcrypt");
@@ -14,6 +15,32 @@ const {
   
 
   module.exports = {
+    updatePassword: (req, res) => {
+      const body = { email: req.data.email, password: req.body.newPassword}
+      if(req.body.newPassword != req.body.confirmPassword){
+        return res.json({
+          success: false,
+          message: "Confirm password not matched!"
+        })
+      }
+      const salt = genSaltSync(10);
+      body.password = hashSync(body.password, salt);
+      
+      updatePassword(body, (err, results) =>{
+        if(err){
+          res.json({
+            success: false,
+            message: "Something went wrong! Please try again."
+          })
+        }
+        if(results){
+          return res.json({
+            success: true,
+            message: "Password updated successfully."
+          })
+        }
+      })
+    },
     createUser: (req, res) => {
       const body = req.data.body;
       if(req.body.code == body.verificationCode){
@@ -27,8 +54,10 @@ const {
           }
 
           const info = {
+            id: results.insertId,
             name: body.name,
             email: body.email,
+            
           }
 
           const jsontoken = jwt.sign({ info}, process.env.JWT_KEY, {
@@ -38,8 +67,7 @@ const {
           return res.status(200).json({
             success: true,
             message: 'Register Successfull',
-            data: results,
-            token: jsontoken
+            data: jsontoken
           });
         })
       }else{
@@ -58,17 +86,18 @@ const {
           console.log(err);
           return res.json({
             success: false,
-            data: 'Internal server error!'
+            message: 'Something went wrong! Please try again!'
           })
         }
 
         if (!results) {
           return res.json({
             success: false,
-            data: "Invalid email or password",
+            message: "Invalid email or password",
           });
         }
-        const result = bcrypt.compare(body.password, results.password);
+        //checking password matched or not
+        const result = bcrypt.compareSync(body.password, results.password)
         if (result) {
           results.password = undefined;
           const jsontoken = jwt.sign({ result: results }, process.env.JWT_KEY, {
@@ -76,15 +105,13 @@ const {
           });
           return res.json({
             success: true,
-            message: "login successfully",
+            message: "Login successfully",
             token: jsontoken
           });
         } else {
           return res.json({
             success: false,
-            data: "Invalid email or password",
-            email: body.email,
-            pass: body.password
+            message: "Invalid email or password",
           });
         }
       });
