@@ -55,7 +55,6 @@ const {
 
           const info = {
             id: results.insertId,
-            name: body.name,
             email: body.email,
             
           }

@@ -3,10 +3,9 @@ const pool = require('../config/db.config');
 module.exports = {
   create: (data, callBack) => {
     pool.query(
-      `INSERT INTO users(name, email, password) 
-                values(?,?,?)`,
+      `INSERT INTO users(email, password) 
+                values(?,?)`,
       [
-        data.name,
         data.email,
         data.password,
       ],
