@@ -73,5 +73,17 @@ module.exports = {
     );
   },
 
+  getTotalExpenses: (id, callBack) => {
+    pool.query(
+      `SELECT SUM(expenses.ammount) as total_expenses FROM users, expenses WHERE users.id = expenses.user_id AND users.id = ?`,
+      [id],
+      (error, results, fields) => {
+        if (error) {
+          callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  }
 
 }

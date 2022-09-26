@@ -7,15 +7,17 @@ const {
   createExpense,
   getExpenses,
   deteExpenses,
-  updateExpenses
+  updateExpenses,
+  getTotalExpense
 } = require("../controller/expense.controller");
 
 
 
-router.post("/new", checkAuthToken, expenseDataValidation, createExpense )
+router.post("/new", checkAuthToken, expenseDataValidation, imageUploader.single('image'), createExpense )
 router.get('/all', checkAuthToken, getExpenses)
 router.patch('/update/:id', checkAuthToken, updateExpenses)
 router.post('/delete/:id', checkAuthToken, deteExpenses)
+router.get('/total-expense', checkAuthToken, getTotalExpense)
 
 
 module.exports = router;

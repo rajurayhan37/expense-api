@@ -2,7 +2,8 @@ const {
     createExpense,
     getExpenses,
     deleteExpense,
-    updateExpense
+    updateExpense,
+    getTotalExpenses
 } = require('../services/expense.service')
 module.exports = {
     createExpense: (req, res) => {
@@ -87,6 +88,29 @@ module.exports = {
             return res.json({
                 success: true,
                 message: "Expense successfully updated."
+            })
+        })
+    },
+
+    getTotalExpense: (req, res) => {
+        const id = req.data.data.id
+        getTotalExpenses(id, (err, result) => {
+            if(err){
+                return res.status(500).json({
+                    success: false,
+                    message: "Something went wrong!"
+                })
+            }
+            if(!result){
+                return res.status(200).json({
+                    success: false,
+                    message: "Expenses not found!",
+                    data: [] 
+                })
+            }
+            return res.status(200).json({
+                success: true,
+                data: result
             })
         })
     }
