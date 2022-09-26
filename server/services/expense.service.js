@@ -3,8 +3,8 @@ const pool = require('../config/db.config');
 module.exports = {
   createExpense: (data, callBack) => {
     pool.query(
-      `INSERT INTO expenses (expense_origin=?, ammount=?, date=?, time=?, expense_category=?, image=?, billing=?) 
-                values(?,?,?,?)`,
+      `INSERT INTO expenses (expense_origin, ammount, date, time, expense_category, image, billing, user_id) 
+                values(?,?,?,?,?,?,?,?)`,
       [
         data.expenseOrigin,
         data.ammount,
@@ -12,8 +12,22 @@ module.exports = {
         data.time,
         data.expenseCategory,
         data.image,
-        data.billing
+        data.billing,
+        data.id
       ],
+      (error, results, fields) => {
+        if (error) {
+          callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
+
+  getExpenses: callBack => {
+    pool.query(
+      `SELECT * FROM expenses`,
+      [],
       (error, results, fields) => {
         if (error) {
           callBack(error);
@@ -35,6 +49,7 @@ module.exports = {
       }
     );
   },
+  
 
   updateExpense: (data, callBack) => {
     pool.query(

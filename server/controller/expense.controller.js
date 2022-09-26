@@ -1,29 +1,47 @@
 const {
     createExpense,
+    getExpenses,
     deleteExpense,
     updateExpense
 } = require('../services/expense.service')
 module.exports = {
     createExpense: (req, res) => {
-        const body = re.body
-        body.image = req.file.filename
+        const body = req.body
+        body.id = req.data.data.id
         createExpense(body, (err, result) => {
             if(err){
-                return res.statusCode(500).json({
+                return res.status(500).json({
                     success: false,
                     message: "Something wrong! Try again."
                 })
             }
-            if(results.affectedRows == false){
+            if(result){
                 return res.json({
                     success: false,
-                    message: "Something wrong! Please try again."
+                    message: "Expense successfully added."
                 })
             }
             return res.json({
                 success: true,
-                message: "Expense successfully added."
+                message: "Failed to create expense!"
             })
+        })
+    },
+
+    getExpenses: (req, res) => {
+        getExpenses((err, results) => {
+            if(err){
+                return res.status(500).json({
+                    success: false,
+                    message: "Something went wrong! Please try again"
+                })
+            }
+            if(results){
+                return res.status(200).json({
+                    success: true,
+                    data: results
+                })
+            }
         })
     },
 

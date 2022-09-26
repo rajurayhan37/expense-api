@@ -7,12 +7,11 @@ module.exports = {
                 message: "Please enter required information!"
             })
         }else if(body.expenseOrigin == undefined || body.expenseOrigin == ''
-            || body.ammount == undefined || body.ammount == ''
-            || body.date == undefined || body.date == ''
-            || body.time == undefined || body.time == ''
-            || body.expenseCategory == undefined || body.expenseCategory == ''
-            || body.billing == undefine || body.billing == ''
-            || body.image == undefined || body.image == '')
+            && body.ammount == undefined || body.ammount == ''
+            && body.date == undefined || body.date == ''
+            && body.time == undefined || body.time == ''
+            && body.expenseCategory == undefined || body.expenseCategory == ''
+            && body.billing == undefine)
         {
             return res.json({
                 success: false,
@@ -43,12 +42,7 @@ module.exports = {
                 success: false,
                 message: "Please enter expense categorey!"
             })
-        }else if(body.image == undefined || body.image == ''){
-            return res.json({
-                success: false,
-                message: "Please enter expense image!"
-            })
-        }else if(body.billing == undefine || body.billing == ''){
+        }else if(body.billing == undefined ){
             return res.json({
                 success: false,
                 message: "Please enter billing status!"

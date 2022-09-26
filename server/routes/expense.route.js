@@ -1,19 +1,21 @@
 const express = require("express")
 const router = express.Router();
-const { checkToken } = require("../auth/validation");
+const { checkAuthToken } = require("../auth/validation");
 const imageUploader = require('../helper/image.uploader') 
 const { expenseDataValidation } = require('../middleware/expense.middleware')
 const {
   createExpense,
+  getExpenses,
   deteExpenses,
   updateExpenses
 } = require("../controller/expense.controller");
 
 
 
-router.post("/new", checkToken, expenseDataValidation, imageUploader.single('image'), createExpense )
-router.patch('/update/:id', checkToken, updateExpenses)
-router.post('/delete/:id', checkToken, deteExpenses)
+router.post("/new", checkAuthToken, expenseDataValidation, createExpense )
+router.get('/all', checkAuthToken, getExpenses)
+router.patch('/update/:id', checkAuthToken, updateExpenses)
+router.post('/delete/:id', checkAuthToken, deteExpenses)
 
 
 module.exports = router;

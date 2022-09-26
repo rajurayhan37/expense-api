@@ -1,17 +1,16 @@
 const {
   createWallet,
   getWallets,
+  deleteWallet,
   getWalletById,
   updateWallet,
 } = require('../services/wallet.service')
-
-const { hashSync, genSaltSync } = require("bcrypt");
   
 
   module.exports = {
     createWallet: (req, res) => {
         const body = req.body;
-        const salt = genSaltSync(10);
+        body.id = req.data.data.id
         createWallet(body, (err, results) => {
           if (err) {
             return res.status(500).json({
@@ -25,122 +24,86 @@ const { hashSync, genSaltSync } = require("bcrypt");
         });
       });
     },
-
-    getUserByUserId: (req, res) => {
-      const id = req.params.id;
-      getUserByUserId(id, (err, results) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        if (!results) {
-          return res.json({
-            success: false,
-            message: "Record not Found"
-          });
-        }
-        results.password = undefined;
-        return res.json({
-          success: true,
-          data: results
-        });
-      });
-    },
     getWallet: (req, res) => {
       getWallets((err, results) => {
         if (err) {
           console.log(err);
           return;
         }
-        return res.json({
+        return res.status(200).json({
           success: true,
           data: results
         });
       });
     },
-    updateUsers: (req, res) => {
-      const body = req.body;
-      const salt = genSaltSync(10);
-      body.password = hashSync(body.password, salt);
-      updateUser(body, (err, results) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        return res.json({
-          success: true,
-          message: "Updated successfully"
-        });
-      });
-    },
-    deleteUser: (req, res) => {
-      const data = req.params.id;
-      deleteUser(data, (err, results) => {
-        if (err) {
-          console.log(err);
-          return res.json({
-            success: false,
-            message: 'Internal server error!'
-          });
-        }
-        if (!results) {
-          return res.json({
-            success: false,
-            message: "User not found!",
-          });
-        }
-        return res.json({
-          success: true,
-          message: "User deleted successfully"
-        });
-      });
-    },
-
-    uploadAvatar: (req, res) => {
-      const body = {
-        id: req.params.id,
-        image: req.file.filename
-      }
-      uploadAvatar(body, (err, results) => {
-        if (err) {
-          console.log(err);
-          return res.json({
-            success: false,
-            message: 'Internal server error!'
-          })
-        }
-
-        if(results.affectedRows == false){
-          return res.json({
-            success: false,
-            message: 'Internal server error!'
-          })
-        }
-
-        return res.json({
-          success: true,
-          message: "Avatar successfully updated"
-        });
-      });
-    },
-
-    removeOldData: (req, res, next) => {
+    getWalletById: (req, res) => {
       const id = req.params.id
-      getUserByUserId(id, (err, results) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        if (!results) {
-          return res.json({
+      getWalletById(id, (err, result) => {
+        if(err){
+          return res.status(500).json({
             success: false,
-            message: "Invalid credintial!"
-          });
+            message: "Something went wrong! Please try again"
+          })
         }
-        image = results.image;
-        const isDelete = remove(image, `./uploads`)
-        next()
-      });
+        if(!result){
+          return res.status(400).json({
+            success: true,
+            message: "Record not found!"
+          })
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: result
+        })
+      })
+    },
+    deleteWallet: (req, res) => {
+      const id = req.params.id
+      deleteWallet(id, (err, result) => {
+        if(err){
+          return res.status(500).json({
+            success: false,
+            message: "Something went wrong! Please try again"
+          })
+        }
+        console.log(result)
+        if(result.affectedRows > 0){
+          return res.status(200).json({
+            success: true,
+            message: "Wallet successfully deleted!"
+          })
+        }
+        else{
+          return res.status(200).json({
+            success: true,
+            message: "Wallet not found!"
+          })
+        }
+      })
+    },
+    updateWallet: (req, res) => {
+      const body = req.body
+      body.id = req.params.id
+      updateWallet(body, (err, result) => {
+        if(err){
+          return res.status(500).json({
+            success: false,
+            message: "Something went wrong! Please try again"
+          })
+        }
+        if(result.affectedRows > 0){
+          return res.status(200).json({
+            success: true,
+            message: "Wallet successfully updated"
+          })
+        }else{
+          return res.status(400).json({
+            success: false,
+            message: "Wallet not found!"
+          })
+        }
+      })
     }
   };
 

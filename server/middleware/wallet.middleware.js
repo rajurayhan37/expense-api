@@ -1,8 +1,9 @@
-const { getUserByUserEmail } = require('../services/user.service')
 
 module.exports = {
     dataValidate: (req, res, next) => {
       const body = req.body;
+      body.totalExpense = 0.00;
+      body.balance = body.initialBalance
       
       if(body == undefined){
         return res.json({

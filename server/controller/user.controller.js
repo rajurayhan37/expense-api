@@ -99,7 +99,7 @@ const {
         const result = bcrypt.compareSync(body.password, results.password)
         if (result) {
           results.password = undefined;
-          const jsontoken = jwt.sign({ result: results }, process.env.JWT_KEY, {
+          const jsontoken = jwt.sign({ data: results }, process.env.JWT_KEY, {
             expiresIn: "1h"
           });
           return res.json({

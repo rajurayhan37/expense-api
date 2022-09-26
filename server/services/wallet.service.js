@@ -3,13 +3,15 @@ const pool = require('../config/db.config');
 module.exports = {
   createWallet: (data, callBack) => {
     pool.query(
-      `INSERT INTO wallets (resource, bank_account, initial_balance, total_expense) 
-                values(?,?,?,?)`,
+      `INSERT INTO wallets (resource, bank_account, initial_balance, total_expense, balance, user_id) 
+                values(?,?,?,?,?,?)`,
       [
         data.resource,
         data.bankAccount,
         data.initialBalance,
-        data.totalExpense
+        data.totalExpense,
+        data.balance,
+        data.id
       ],
       (error, results, fields) => {
         if (error) {
