@@ -11,19 +11,16 @@ module.exports = {
         body.id = req.data.data.id
         createExpense(body, (err, result) => {
             if(err){
-                return res.status(500).json({
-                    success: false,
-                    message: "Something wrong! Try again."
-                })
+                return res.status(500).send("Something went wrong!")
             }
             if(result){
-                return res.json({
-                    success: false,
+                return res.status(200).json({
+                    success: true,
                     message: "Expense successfully added."
                 })
             }
-            return res.json({
-                success: true,
+            return res.status(304).json({
+                success: false,
                 message: "Failed to create expense!"
             })
         })
@@ -32,17 +29,16 @@ module.exports = {
     getExpenses: (req, res) => {
         getExpenses((err, results) => {
             if(err){
-                return res.status(500).json({
-                    success: false,
-                    message: "Something went wrong! Please try again"
-                })
+                return res.status(500).send("Something went wrong!")
             }
-            if(results){
-                return res.status(200).json({
-                    success: true,
-                    data: results
-                })
+            if(!results){
+                return res.status(404).send("Expense record not found!")
             }
+
+            return res.status(200).json({
+                success: true,
+                data: results
+            })
         })
     },
 
@@ -50,18 +46,12 @@ module.exports = {
         const id = req.params.id
         deleteExpense(id, (err, result) => {
             if(err){
-                return res.json({
-                    success: false,
-                    message: "Something went wrong! Please try again"
-                })
+                return res.status(500).send("Something went wrong!")
             }
-            if(results.affectedRows == false){
-                return res.json({
-                    success: false,
-                    message: "Something went wrong! Please try again."
-                })
+            if(!results){
+                return res.status(404).send("Expense record not found!")
             }
-            return res.json({
+            return res.status(200).json({
                 success: true,
                 message: "Expense successfully deleted!."
             })
@@ -74,21 +64,15 @@ module.exports = {
         body.id = req.params.id
         updateExpense(body, (err, result) => {
             if(err){
-                return res.json({
-                    success: false,
-                    message: "Something went wrong! Please try again"
-                })
+                res.statusCode = 500
+                return res.status(500).send("Something went wrong!")
             }
-            if(results.affectedRows == false){
-                return res.json({
-                    success: false,
-                    message: "Something went wrong! Please try again."
-                })
+            if(!results){
+                res.statusCode = 404
+                return res.status(404).send("Expense record not found!")
             }
-            return res.json({
-                success: true,
-                message: "Expense successfully updated."
-            })
+            res.statusCode = 200
+            return res.status(200).send("Expense successfully updated")
         })
     },
 
@@ -96,18 +80,14 @@ module.exports = {
         const id = req.data.data.id
         getTotalExpenses(id, (err, result) => {
             if(err){
-                return res.status(500).json({
-                    success: false,
-                    message: "Something went wrong!"
-                })
+                res.statusCode = 500
+                return res.status(500).send("Something went wrong!")
             }
             if(!result){
-                return res.status(200).json({
-                    success: false,
-                    message: "Expenses not found!",
-                    data: [] 
-                })
+                res.statusCode = 404
+                return res.status(404).send("Expenses not found!")
             }
+            res.statusCode = 200
             return res.status(200).json({
                 success: true,
                 data: result

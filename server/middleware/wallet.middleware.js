@@ -6,26 +6,22 @@ module.exports = {
       body.balance = body.initialBalance
       
       if(body == undefined){
-        return res.json({
-          success: false,
-          message: 'Please provdie all information!'
-        });
+        res.statusCode = 404
+        return res.status(404).send("Please provdie all information!")
+        
       }
       else if (body.resource == undefined || body.resource == ''){
-          return res.json({
-            success: false,
-            message: 'Please enter the resource!'
-          })
+        res.statusCode = 404
+        return res.status(404).send("Please enter the resource!")  
+        
       }else if (body.bankAccount == undefined || body.bankAccount == '' ){
-          return res.json({
-            success: false,
-            message: 'Please enter your bank account!'
-          })
+        res.statusCode = 404
+        return res.status(404).send("Please enter your bank account!")    
+       
       }else if (body.initialBalance == undefined ||body.initialBalance == ''){
-          return res.json({
-            success: false,
-            message: 'Please enter your initial balance!'
-          })
+        res.statusCode = 404
+        return res.status(404).send("Please enter your initial balance!")
+       
       }
       else{
         next();

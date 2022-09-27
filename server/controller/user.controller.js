@@ -83,17 +83,13 @@ const {
       getUserByUserEmail(body.email, (err, results) => {
         if (err) {
           console.log(err);
-          return res.json({
-            success: false,
-            message: 'Something went wrong! Please try again!'
-          })
+          res.statusCode = 500
+          return res.status(500).send("Something went wrong!");
         }
 
         if (!results) {
-          return res.json({
-            success: false,
-            message: "Invalid email or password",
-          });
+          res.statusCode = 401
+          return res.status(401).send("Invalid email or password");
         }
         //checking password matched or not
         const result = bcrypt.compareSync(body.password, results.password)
@@ -102,16 +98,15 @@ const {
           const jsontoken = jwt.sign({ data: results }, process.env.JWT_KEY, {
             expiresIn: "1h"
           });
-          return res.json({
+          res.statusCode = 200
+          return res.status(200).json({
             success: true,
             message: "Login successfully",
             token: jsontoken
           });
         } else {
-          return res.json({
-            success: false,
-            message: "Invalid email or password",
-          });
+          res.statusCode = 401
+          return res.status(401).send("Invalid email or password");
         }
       });
     },
@@ -119,17 +114,17 @@ const {
       const id = req.params.id;
       getUserByUserId(id, (err, results) => {
         if (err) {
-          console.log(err);
-          return;
+          res.statusCode = 500
+          return res.status(500).send("Something wen wrong!");
         }
         if (!results) {
-          return res.json({
-            success: false,
-            message: "Record not Found"
-          });
+          res.statusCode = 404
+          return res.status(404).send("Record not Found");
+          
         }
         results.password = undefined;
-        return res.json({
+        res.statusCode = 200
+        return res.status(200).json({
           success: true,
           data: results
         });
@@ -138,10 +133,11 @@ const {
     getUsers: (req, res) => {
       getUsers((err, results) => {
         if (err) {
-          console.log(err);
-          return;
+          res.statusCode = 500
+          return res.status(500).send("Something wen wrong!");
         }
-        return res.json({
+        res.statusCode = 200
+        return res.status(200).json({
           success: true,
           data: results
         });
@@ -153,35 +149,26 @@ const {
       body.password = hashSync(body.password, salt);
       updateUser(body, (err, results) => {
         if (err) {
-          console.log(err);
-          return;
+          res.statusCode = 500
+          return res.status(500).send("Something wen wrong!");
         }
-        return res.json({
-          success: true,
-          message: "Updated successfully"
-        });
+        res.statusCode = 200
+        return res.status(200).send("Updated successfully");
       });
     },
     deleteUser: (req, res) => {
       const data = req.params.id;
       deleteUser(data, (err, results) => {
         if (err) {
-          console.log(err);
-          return res.json({
-            success: false,
-            message: 'Internal server error!'
-          });
+          res.statusCode = 500
+          return res.status(500).send("Something wen wrong!");
         }
         if (!results) {
-          return res.json({
-            success: false,
-            message: "User not found!",
-          });
+          res.statusCode = 404
+          return res.status(404).send("User not found!");
         }
-        return res.json({
-          success: true,
-          message: "User deleted successfully"
-        });
+        res.statusCode =200
+        return res.status(200).send("User deleted successfully");
       });
     },
 

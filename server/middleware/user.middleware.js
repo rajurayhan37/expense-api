@@ -21,32 +21,25 @@ module.exports = {
     dataValidation: (req, res, next) => {
       const body = req.body;
       if(body == undefined){
-        return res.json({
-          success: false,
-          message: 'Please provide all information!'
-        })
+        res.statusCode = 404
+        res.status(404).send("Please enter email and password!")
       }else if(body.email == undefined || body.email == ''){
-        return res.json({
-          success: false,
-          message: 'Please enter your email!',
-        })
+        res.statusCode = 404
+        res.status(404).send("Please enter your email!")
+
       }
       else if(!validateEmail(body.email)){
-        res.json({
-          success: false,
-          message: 'Invalid email!.Please enter valid email.'
-        })
+        res.statusCode = 404
+        res.status(404).send("Invalid email!.Please enter valid email!")
       }
       else if(body.password == undefined || body.password == ''){
-        return res.json({
-          success: false,
-          message: 'Please enter your password!',
-        })
+        res.statusCode = 404
+        res.status(404).send("Please enter your password!")
+
       }else if(!passwordValidation(body.password)){
-        return res.json({
-          success: false,
-          message: 'Password must be minimum of 8 characters including number,uppper,lowercase letter!'
-        })
+        
+        res.statusCode = 404
+        res.status(404).send("Password must be minimum of 8-12 characters including number,uppper,lowercase letter!")
       }else{
         next()
       }
@@ -56,27 +49,22 @@ module.exports = {
       if(passwordValidation(req.body.password)){
         next()
       }
-      return res.json({
-        success: false,
-        message: "Password must be minimum 8 including number,upper and lowercase letter!"
-      })
+      res.statusCode = 404
+      res.status(404).send("Password must be minimum of 8-12 characters including number,uppper,lowercase letter!")
     },
 
     emailVerificationSend: (req, res) => {
         const body = req.body
         getUserByUserEmail(body.email, (err, results) => {
             if(err){
-                res.json({
-                    sucsess: false,
-                    message: 'Something went wrong!. Please try again'
-                })
+              res.statusCode = 500
+              res.status(500).send("Something went wrong!")
             }
             
             if(results){
-                return res.json({
-                  success: false,
-                  data: 'Email is already used!. Please enter vlaid email.'
-                })
+              res.statusCode = 404
+              res.status(404).send("Email is already used!. Please enter vlaid email.")
+                
               }else{
                 //generate random 4 digit verification code
                 const verificationCode = (Math.floor(1000 + Math.random() * 9000)).toString()
@@ -265,15 +253,12 @@ module.exports = {
                  
                 mailTransporter.sendMail(mailDetails, function(err, data) {
                     if(err) {
-                        console.log('Error Occurs', err);
-                        return res.json({
-                            success: false,
-                            message: 'Registration failed!',
-                            token: jsontoken
-                        })
+                      res.statusCode = 424 
+                      res.status(424 ).send("Registration failed!")
+                        
                     } else {
+                        res.statusCode = 200
                         return res.json({
-                            success: true,
                             message: 'Verification code sent to your email.',
                             token: jsontoken
                         })

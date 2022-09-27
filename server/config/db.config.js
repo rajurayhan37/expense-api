@@ -1,4 +1,4 @@
-const { createPool } = require("mysql");
+const { createPool } = require("mysql2");
 
 const pool = createPool({
   host: process.env.DB_HOST,

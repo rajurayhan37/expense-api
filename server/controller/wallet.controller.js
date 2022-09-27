@@ -13,23 +13,20 @@ const {
         body.id = req.data.data.id
         createWallet(body, (err, results) => {
           if (err) {
-            return res.status(500).json({
-              success: false,
-              message: "Database connection failed!. Please try again"
-            });
+            res.statusCode = 500
+            return res.status(500).send("Something went wrong!");
           }
-          return res.status(200).json({
-            success: true,
-            message: 'Wallet Successfully added',
-        });
+          res.statusCode = 200
+          return res.status(200).send('Wallet Successfully added');
       });
     },
     getWallet: (req, res) => {
       getWallets((err, results) => {
         if (err) {
-          console.log(err);
-          return;
+          res.statusCode = 500
+          return res.status(500).send("Something went wrong!");
         }
+        res.statusCode = 200
         return res.status(200).json({
           success: true,
           data: results
@@ -40,18 +37,14 @@ const {
       const id = req.params.id
       getWalletById(id, (err, result) => {
         if(err){
-          return res.status(500).json({
-            success: false,
-            message: "Something went wrong! Please try again"
-          })
+          res.statusCode = 500
+          return res.status(500).send("Something went wrong! Please try again")
         }
         if(!result){
-          return res.status(400).json({
-            success: true,
-            message: "Record not found!"
-          })
+          res.statusCode = 400
+          return res.status(400).send("Record not found!")
         }
-
+        res.statusCode = 200
         return res.status(200).json({
           success: true,
           message: result
@@ -62,23 +55,17 @@ const {
       const id = req.params.id
       deleteWallet(id, (err, result) => {
         if(err){
-          return res.status(500).json({
-            success: false,
-            message: "Something went wrong! Please try again"
-          })
+          res.statusCode = 500
+          return res.status(500).send("Something went wrong! Please try again")
         }
-        console.log(result)
+
         if(result.affectedRows > 0){
-          return res.status(200).json({
-            success: true,
-            message: "Wallet successfully deleted!"
-          })
+          res.statusCode = 200
+          return res.status(200).send("Wallet successfully deleted!")
         }
         else{
-          return res.status(200).json({
-            success: true,
-            message: "Wallet not found!"
-          })
+          res.statusCode = 400
+          return res.status(404).send("Wallet not found!")
         }
       })
     },

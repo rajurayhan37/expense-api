@@ -9,20 +9,17 @@ module.exports = {
       token = token.slice(process.env.JWT_KEY.length);
       jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
         if (err) {
-          return res.json({
-            success: false,
-            message: "Invalid token!"
-          });
+          res.statusCode = 498 
+          return res.status(401).send("Invalid token!")
         } else {
           req.body = decoded;
           next();
         }
       });
     } else {
-      return res.json({
-        success: false,
-        message: "Access Denied! Unauthorized User"
-      });
+      res.statusCode = 401
+      return res.status(401).send("Access Denied! Unauthorized User!")
+      
     }
   },
 
@@ -34,20 +31,16 @@ module.exports = {
       token = token.slice(process.env.JWT_KEY.length);
       jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
         if (err) {
-          return res.json({
-            success: false,
-            message: "Invalid token!"
-          });
+          res.statusCode = 498 
+          return res.status(401).send("Invalid token!")
         } else {
           req.data = decoded;
           next();
         }
       });
     } else {
-      return res.json({
-        success: false,
-        message: "Access Denied! Unauthorized User"
-      });
+      res.statusCode = 401
+      return res.status(401).send("Access Denied! Unauthorized User!")
     }
   },
 
@@ -59,20 +52,16 @@ module.exports = {
       token = token.slice(process.env.JWT_KEY.length);
       jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
         if (err) {
-          return res.json({
-            success: false,
-            message: "Invalid token!"
-          });
+          res.statusCode = 498 
+          return res.status(401).send("Invalid token!")
         } else {
           req.data = decoded;
           next();
         }
       });
     } else {
-      return res.json({
-        success: false,
-        message: "Access Denied! Unauthorized User"
-      });
+      res.statusCode = 401
+      return res.status(401).send("Access Denied! Unauthorized User!")
     }
   },
 };
